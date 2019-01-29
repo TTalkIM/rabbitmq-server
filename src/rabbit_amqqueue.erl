@@ -137,7 +137,7 @@
 -spec notify_policy_changed(rabbit_types:amqqueue()) -> 'ok'.
 -spec consumers(rabbit_types:amqqueue()) ->
           [{pid(), rabbit_types:ctag(), boolean(), non_neg_integer(),
-            rabbit_framing:amqp_table()}].
+            boolean(), list(), rabbit_framing:amqp_table()}].
 -spec consumer_info_keys() -> rabbit_types:info_keys().
 -spec consumers_all(rabbit_types:vhost()) ->
           [{name(), pid(), rabbit_types:ctag(), boolean(),
@@ -162,11 +162,11 @@
 -spec purge(rabbit_types:amqqueue()) -> {ok, qlen()}.
 -spec forget_all_durable(node()) -> 'ok'.
 -spec deliver([rabbit_types:amqqueue()], rabbit_types:delivery(), #{Name :: atom() => rabbit_fifo_client:state()} | 'untracked') ->
-                        {qpids(), #{Name :: atom() => rabbit_fifo_client:state()}}.
+                        {qpids(), [pid()], #{Name :: atom() => rabbit_fifo_client:state()}}.
 -spec deliver([rabbit_types:amqqueue()], rabbit_types:delivery()) -> 'ok'.
--spec requeue(pid(), [msg_id()],  pid(), #{Name :: atom() => rabbit_fifo_client:state()}) -> 'ok'.
--spec ack(pid(), [msg_id()], pid(), #{Name :: atom() => rabbit_fifo_client:state()}) -> 'ok'.
--spec reject(pid() | {atom(), node()}, [msg_id()], boolean(), pid(),
+-spec requeue(pid() | {atom(), node()}, {any(), [msg_id()]},  pid(), #{Name :: atom() => rabbit_fifo_client:state()}) -> 'ok'.
+-spec ack(pid() | {atom(), node()}, {any(), msg_id()}, pid(), #{Name :: atom() => rabbit_fifo_client:state()}) -> 'ok'.
+-spec reject(pid() | {atom(), node()}, boolean(), {any(), msg_id()}, pid(),
              #{Name :: atom() => rabbit_fifo_client:state()}) -> 'ok'.
 -spec notify_down_all(qpids(), pid()) -> ok_or_errors().
 -spec notify_down_all(qpids(), pid(), non_neg_integer()) ->
@@ -177,8 +177,9 @@
           {'ok', non_neg_integer(), qmsg()} | 'empty'.
 -spec credit
         (rabbit_types:amqqueue(), pid(), rabbit_types:ctag(), non_neg_integer(),
-         boolean(), #{Name :: atom() => rabbit_fifo_client:state()}) ->
-            'ok'.
+         boolean(), QStates) ->
+            {'ok', QStates}
+            when QStates :: #{Name :: atom() => rabbit_fifo_client:state()}.
 -spec basic_consume
         (rabbit_types:amqqueue(), boolean(), pid(), pid(), boolean(),
          non_neg_integer(), rabbit_types:ctag(), boolean(),
